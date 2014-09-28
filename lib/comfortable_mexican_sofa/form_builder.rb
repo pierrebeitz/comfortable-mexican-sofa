@@ -29,7 +29,7 @@ class ComfortableMexicanSofa::FormBuilder < BootstrapForm::FormBuilder
     end
     content << @template.hidden_field_tag("#{fieldname}[blocks_attributes][#{index}][identifier]", tag.identifier, :id => nil)
 
-    form_group :label => {:text => label} do 
+    form_group :label => {:text => label} do
       content.html_safe
     end
   end
@@ -59,13 +59,17 @@ class ComfortableMexicanSofa::FormBuilder < BootstrapForm::FormBuilder
     content = @template.hidden_field_tag("#{fieldname}[blocks_attributes][#{index}][content]", '', :id => nil)
     content << @template.check_box_tag("#{fieldname}[blocks_attributes][#{index}][content]", '1', tag.content.present?, :id => nil)
     content << @template.hidden_field_tag("#{fieldname}[blocks_attributes][#{index}][identifier]", tag.identifier, :id => nil)
-    form_group :label => {:text => tag.identifier.titleize + "?"} do 
+    form_group :label => {:text => tag.identifier.titleize + "?"} do
       content
     end
   end
 
   def page_date_time(tag, index)
     default_tag_field(tag, index, :text_field_tag, :data => {'cms-datetime' => true})
+  end
+
+  def page_grid_manager(tag, index)
+    default_tag_field(tag, index, :text_area_tag, :data => {'cms-grid-manager' => true})
   end
 
   def page_integer(tag, index)

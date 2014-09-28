@@ -12,6 +12,7 @@
 #= require bootstrap
 #= require comfortable_mexican_sofa/lib/bootstrap-datetimepicker
 #= require comfortable_mexican_sofa/lib/diff
+#= require comfortable_mexican_sofa/lib/jquery.gridmanager
 
 $ ->
   CMS.init()
@@ -19,7 +20,7 @@ $ ->
 window.CMS =
   current_path:           window.location.pathname
   code_mirror_instances:  []
-  
+
   init: ->
     CMS.slugify()
     CMS.wysiwyg()
@@ -33,7 +34,17 @@ window.CMS =
     CMS.categories()
     CMS.uploader()
     CMS.uploaded_files()
+    CMS.grid_manager()
 
+window.CMS.tinymce_config =
+  selector:         'textarea[data-cms-rich-text]'
+  plugins:          'lists link image code hr fullscreen searchreplace visualblocks media contextmenu paste'
+  toolbar:          'undo redo | styleselect | hr bullist numlist | link unlink image | code fullscreen'
+  inline:           true
+  menubar:          false
+  statusbar:        false
+  relative_urls:    false
+  entity_encoding:  'raw'
 
 window.CMS.slugify = ->
   slugify = (str) ->
@@ -46,20 +57,12 @@ window.CMS.slugify = ->
     str = str.replace(chars_to_replace_with_delimiter, '-')
     chars_to_remove = new RegExp('[^a-zA-Z0-9 -]', 'g')
     str = str.replace(chars_to_remove, '').replace(/\s+/g, '-').toLowerCase()
-    
+
   $('input[data-slugify=true]').bind 'keyup.cms', ->
     $('input[data-slug=true]').val(slugify($(this).val()))
 
-
 window.CMS.wysiwyg = ->
-  tinymce.init
-    selector:         'textarea[data-cms-rich-text]'
-    plugins:          ['link', 'image', 'code']
-    toolbar:          'undo redo | styleselect | bullist numlist | link unlink image | code'
-    menubar:          false
-    statusbar:        false
-    relative_urls:    false
-    entity_encoding : 'raw'
+  tinymce.init window.CMS.tinymce_config
 
 window.CMS.codemirror = ->
   $('textarea[data-cms-cm-mode]').each (i, element) ->
@@ -78,6 +81,23 @@ window.CMS.codemirror = ->
       cm.refresh()
     return
   return
+
+window.CMS.grid_manager = ->
+  $('[data-cms-grid-manager]').each (i, element)->
+    $textarea = $(element).hide()
+    $manager = $('<div></div>')
+    $manager.append($textarea.val())
+    $textarea.after $manager
+    gm = $manager.gridmanager
+      tinymce:
+        config: window.CMS.tinymce_config
+    .data('gridmanager')
+    canvas = gm.$el.find('#' + gm.options.canvasId)
+
+    $('#edit_page').on 'submit', ->
+      gm.rteControl 'stop'
+      gm.deinitCanvas()
+      $textarea.val(canvas.html());
 
 window.CMS.sortable_list = ->
   $('.sortable').sortable
@@ -128,7 +148,7 @@ window.CMS.page_update_publish = ->
   widget = $('#form-save')
   $('input', widget).prop('checked', $('input#page_is_published').is(':checked'))
   $('button', widget).html($('input[name=commit]').val())
-  
+
   $('input', widget).click ->
     $('input#page_is_published').prop('checked', $(this).is(':checked'))
   $('input#page_is_published').click ->
@@ -149,11 +169,11 @@ window.CMS.categories = ->
 window.CMS.uploader = ->
   form    = $('.file-uploader form')
   iframe  = $('iframe#file-upload-frame')
-  
+
   $('input[type=file]', form).change -> form.submit()
-    
+
   iframe.load -> upload_loaded()
-  
+
   upload_loaded = ->
     i = iframe[0]
     d = if i.contentDocument
@@ -162,7 +182,7 @@ window.CMS.uploader = ->
       i.contentWindow.document
     else
       i.document
-    
+
     if d.body.innerHTML
       raw_string  = d.body.innerHTML
       json_string = raw_string.match(/\{(.|\n)*\}/)[0]
