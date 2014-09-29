@@ -13,29 +13,15 @@
 #= require comfortable_mexican_sofa/lib/bootstrap-datetimepicker
 #= require comfortable_mexican_sofa/lib/diff
 #= require comfortable_mexican_sofa/lib/jquery.gridmanager
+#= require comfortable_mexican_sofa/lib/uploader
+#= require comfortable_mexican_sofa/lib/files
 
 $ ->
   CMS.init()
 
-window.CMS =
-  current_path:           window.location.pathname
-  code_mirror_instances:  []
-
-  init: ->
-    CMS.slugify()
-    CMS.wysiwyg()
-    CMS.codemirror()
-    CMS.sortable_list()
-    CMS.timepicker()
-    CMS.page_blocks()
-    CMS.mirrors()
-    CMS.page_update_preview()
-    CMS.page_update_publish()
-    CMS.categories()
-    CMS.uploader()
-    CMS.uploaded_files()
-    CMS.grid_manager()
-
+window.CMS ||= {}
+window.CMS.current_path = window.location.pathname
+window.CMS.code_mirror_instances = []
 window.CMS.tinymce_config =
   selector:         'textarea[data-cms-rich-text]'
   plugins:          'lists link image code hr fullscreen searchreplace visualblocks media contextmenu paste'
@@ -45,6 +31,20 @@ window.CMS.tinymce_config =
   statusbar:        false
   relative_urls:    false
   entity_encoding:  'raw'
+
+window.CMS.init = ->
+  CMS.slugify()
+  CMS.wysiwyg()
+  CMS.codemirror()
+  CMS.sortable_list()
+  CMS.timepicker()
+  CMS.page_blocks()
+  CMS.mirrors()
+  CMS.page_update_preview()
+  CMS.page_update_publish()
+  CMS.categories()
+  CMS.files()
+  CMS.grid_manager()
 
 window.CMS.slugify = ->
   slugify = (str) ->
@@ -164,34 +164,3 @@ window.CMS.categories = ->
     $('.categories.editable', '.categories-widget').toggle()
     $('.edit', '.categories-widget').toggle()
     $('.done', '.categories-widget').toggle()
-
-
-window.CMS.uploader = ->
-  form    = $('.file-uploader form')
-  iframe  = $('iframe#file-upload-frame')
-
-  $('input[type=file]', form).change -> form.submit()
-
-  iframe.load -> upload_loaded()
-
-  upload_loaded = ->
-    i = iframe[0]
-    d = if i.contentDocument
-      i.contentDocument
-    else if i.contentWindow
-      i.contentWindow.document
-    else
-      i.document
-
-    if d.body.innerHTML
-      raw_string  = d.body.innerHTML
-      json_string = raw_string.match(/\{(.|\n)*\}/)[0]
-      json = $.parseJSON(json_string)
-      files = $('<div/>').html(json.view).hide()
-      $('.uploaded-files').prepend(files)
-      files.map ->
-        $(this).fadeIn()
-
-window.CMS.uploaded_files = ->
-  $('.uploaded-files').on 'click', 'input', ->
-    $(this).select()
