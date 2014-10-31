@@ -59,7 +59,7 @@ class Comfy::Cms::ContentControllerTest < ActionController::TestCase
     assert_equal 1,               json_response['children_count']
     assert_equal true,            json_response['is_published']
   end
-  
+
   def test_show_with_custom_mimetype
     layout = comfy_cms_sites(:default).layouts.create!(
       :label      => 'RSS Layout',
