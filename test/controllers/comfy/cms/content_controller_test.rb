@@ -25,13 +25,15 @@ class Comfy::Cms::ContentControllerTest < ActionController::TestCase
   def test_show_default_html
     @request.headers["Accept"] = "*/*"
     get :show, :cms_path => ''
+    assert_response :success
     assert_equal 'text/html', response.content_type
   end
-  
+
   def test_show_as_json
     get :show, :cms_path => '', :format => 'json'
     assert_response :success
-    
+    assert_equal 'application/json', response.content_type
+
     content = rendered_content_formatter(
       '
       layout_content_a
@@ -58,12 +60,36 @@ class Comfy::Cms::ContentControllerTest < ActionController::TestCase
     assert_equal true,            json_response['is_published']
   end
 
+  def test_show_with_custom_mimetype
+    layout = comfy_cms_sites(:default).layouts.create!(
+      :label      => 'RSS Layout',
+      :identifier => 'rss-layout',
+      :content    => '{{cms:field:mime_type}}{{cms:page:content}}',
+    )
+    page = comfy_cms_sites(:default).pages.create!(
+      :label          => 'rss',
+      :slug           => 'rss',
+      :parent_id      => comfy_cms_pages(:default).id,
+      :layout_id      => layout.id,
+      :is_published   => true,
+      :blocks_attributes => [
+        { :identifier => 'content',
+          :content    => 'content' },
+        { :identifier => 'mime_type',
+          :content    => 'application/rss+xml' }
+      ]
+    )
+    get :show, :cms_path => 'rss'
+    assert_response :success
+    assert_equal 'application/rss+xml', response.content_type
+  end
+
   def test_show_with_app_layout
     comfy_cms_layouts(:default).update_columns(:app_layout => 'comfy/admin/cms')
     get :show, :cms_path => ''
     assert_response :success
     assert assigns(:cms_page)
-    assert_select "body[class='c-comfy-cms-content a-show']"
+    assert_select "body.c-comfy-cms-content.a-show"
   end
 
   def test_show_with_xhr
@@ -71,7 +97,7 @@ class Comfy::Cms::ContentControllerTest < ActionController::TestCase
     xhr :get, :show, :cms_path => ''
     assert_response :success
     assert assigns(:cms_page)
-    assert_no_select "body[class='c_cms_content a_show']"
+    assert_no_select "body.c-comfy-cms-content.a-show"
   end
 
   def test_show_not_found

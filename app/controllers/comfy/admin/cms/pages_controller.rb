@@ -4,11 +4,12 @@ class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
   before_action :build_cms_page,    :only => [:new, :create]
   before_action :load_cms_page,     :only => [:edit, :update, :destroy]
   before_action :preview_cms_page,  :only => [:create, :update]
-  before_action :build_file,        :only => [:new, :edit]
 
   def index
-    return redirect_to :action => :new if @site.pages.count == 0
-    @pages_by_parent = @site.pages.includes(:categories).group_by(&:parent_id)
+    return redirect_to :action => :new if site_has_no_pages?
+
+    @pages_by_parent = pages_grouped_by_parent
+
     if params[:category].present?
       @pages = @site.pages.includes(:categories).for_category(params[:category]).order('label')
     else
@@ -54,7 +55,7 @@ class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
   end
 
   def toggle_branch
-    @pages_by_parent = @site.pages.includes(:categories).group_by(&:parent_id)
+    @pages_by_parent = pages_grouped_by_parent
     @page = @site.pages.find(params[:id])
     s   = (session[:cms_page_tree] ||= [])
     id  = @page.id.to_s
@@ -72,6 +73,14 @@ class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
 
 protected
 
+  def site_has_no_pages?
+    @site.pages.count == 0
+  end
+
+  def pages_grouped_by_parent
+    @site.pages.includes(:categories).group_by(&:parent_id)
+  end
+
   def check_for_layouts
     if @site.layouts.count == 0
       flash[:danger] = I18n.t('comfy.admin.cms.pages.layout_not_found')
@@ -83,10 +92,6 @@ protected
     @page = @site.pages.new(page_params)
     @page.parent ||= (@site.pages.find_by_id(params[:parent_id]) || @site.pages.root)
     @page.layout ||= (@page.parent && @page.parent.layout || @site.layouts.first)
-  end
-
-  def build_file
-    @file = Comfy::Cms::File.new
   end
 
   def load_cms_page
@@ -104,14 +109,14 @@ protected
       @cms_site   = @page.site
       @cms_layout = @page.layout
       @cms_page   = @page
-      
+
       # Chrome chokes on content with iframes. Issue #434
       response.headers['X-XSS-Protection'] = '0'
-      
+
       render :inline => @page.render, :layout => layout, :content_type => 'text/html'
     end
   end
-  
+
   def page_params
     params.fetch(:page, {}).permit!
   end

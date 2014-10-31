@@ -10,7 +10,9 @@
       .right-column-content
         = render 'layouts/comfy/admin/cms/right'
     .center-column
-      = render 'layouts/comfy/admin/cms/center'
+      = render 'layouts/comfy/admin/cms/flash'
+      .center-column-content
+        = yield
       = render 'layouts/comfy/admin/cms/footer'
-  
+
   = render 'layouts/comfy/admin/cms/footer_js'
