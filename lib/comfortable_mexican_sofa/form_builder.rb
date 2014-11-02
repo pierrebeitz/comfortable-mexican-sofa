@@ -178,6 +178,8 @@ class ComfortableMexicanSofa::FormBuilder < BootstrapForm::FormBuilder
     end
   end
 
+  alias :field_tag :page_tag
+
   def collection(tag, index)
     options = [["---- Select #{tag.collection_class.titleize} ----", nil]] +
       tag.collection_objects.collect do |m|
