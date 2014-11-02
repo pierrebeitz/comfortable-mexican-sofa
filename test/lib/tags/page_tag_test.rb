@@ -4,12 +4,12 @@ class PageTagTest < ActiveSupport::TestCase
 
   def test_initialize_tag
     assert tag = ComfortableMexicanSofa::Tag::PageTag.initialize_tag(
-      comfy_cms_pages(:default), '{{ cms:page:content:text_field({ "label": "Some Id" })  }}'
+      comfy_cms_pages(:default), '{{ cms:page:content:text_field({ "label": "Some Id" }) }}'
     )
     assert_equal 'content', tag.identifier
 
     assert tag = ComfortableMexicanSofa::Tag::PageTag.initialize_tag(
-      comfy_cms_pages(:default), '{{ cms:page:content:file_field({ "label": "Some Id" })  }}'
+      comfy_cms_pages(:default), '{{ cms:page:content:file_field({ "label": "Some Id" }) }}'
     )
     assert_equal 'content', tag.identifier
 
@@ -34,7 +34,7 @@ class PageTagTest < ActiveSupport::TestCase
 
   def test_content_and_render
     tag = ComfortableMexicanSofa::Tag::PageTag.initialize_tag(
-      comfy_cms_pages(:default), '{{ cms:page:content:text_field() }}'
+      comfy_cms_pages(:default), '{{ cms:page:content:text_field }}'
     )
     assert tag.block.content.blank?
     tag.block.content = 'test_content'

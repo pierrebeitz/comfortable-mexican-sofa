@@ -16,7 +16,7 @@ class ComfortableMexicanSofa::Tag::PageTag
   def self.initialize_tag(blockable, tag_signature)
     if match = tag_signature.match(regex_tag_signature)
       field_helper = match[2]
-
+      return unless BootstrapForm::FormBuilder.instance_methods.include? field_helper.to_sym
       # wrapping as array, to save the user some typing
       params = begin
         JSON.parse '[' + match[3].gsub(/\s*\((.*)\)\s*/, '\1') + ']', symbolize_names: true
