@@ -91,7 +91,6 @@ en:
           update_failure: Failed to update layout
           deleted: Layout deleted
           not_found: Layout not found
-          contains_invalid_tag: Layout contains invalid page tag
 
           index:
             title: Layouts

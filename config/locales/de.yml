@@ -91,7 +91,6 @@ de:
           update_failure: Fehler beim Aktualisieren des Layouts!
           deleted: Layout gelöscht
           not_found: Layout nicht angelegt
-          contains_invalid_tag: Layout enthält Fehlerhaftes Page-Tag
 
           index:
             title: Layouts

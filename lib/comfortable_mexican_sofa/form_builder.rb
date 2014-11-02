@@ -169,13 +169,9 @@ class ComfortableMexicanSofa::FormBuilder < BootstrapForm::FormBuilder
 
     options[:label] ||= tag.blockable.class.human_attribute_name(tag.identifier.to_s)
 
-    begin
-      content << @template.send(tag.field_helper, "#{fieldname}[blocks_attributes][#{index}]", :content, *params)
-      content << @template.hidden_field_tag("#{fieldname}[blocks_attributes][#{index}][identifier]", tag.identifier, :id => nil)
-    rescue Exception => e
-      content << e.message
-      content << I18n.t('comfy.admin.cms.layouts.contains_invalid_tag') + ': ' + tag.field_helper
-    end
+    content << @template.send(tag.field_helper, "#{fieldname}[blocks_attributes][#{index}]", :content, *params)
+    content << @template.hidden_field_tag("#{fieldname}[blocks_attributes][#{index}][identifier]", tag.identifier, :id => nil)
+
     content.html_safe
     form_group :label => {:text => options[:label]} do
       content.html_safe
