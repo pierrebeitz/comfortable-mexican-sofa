@@ -59,7 +59,7 @@ class ComfortableMexicanSofa::FormBuilder < BootstrapForm::FormBuilder
     content = @template.hidden_field_tag("#{fieldname}[blocks_attributes][#{index}][content]", '', :id => nil)
     content << @template.check_box_tag("#{fieldname}[blocks_attributes][#{index}][content]", '1', tag.content.present?, :id => nil)
     content << @template.hidden_field_tag("#{fieldname}[blocks_attributes][#{index}][identifier]", tag.identifier, :id => nil)
-    form_group :label => {:text => (tag.blockable.class.human_attribute_name(tag.identifier.to_s) || tag.identifier.titleize + "?")} do 
+    form_group :label => {:text => (tag.blockable.class.human_attribute_name(tag.identifier.to_s) || tag.identifier.titleize + "?")} do
       content
     end
   end
@@ -94,6 +94,88 @@ class ComfortableMexicanSofa::FormBuilder < BootstrapForm::FormBuilder
 
   def page_markdown(tag, index)
     default_tag_field(tag, index, :text_area_tag, :data => {'cms-cm-mode' => 'text/x-markdown'})
+  end
+
+  def page_tag(tag, index)
+    css_class       = tag.class.to_s.demodulize.underscore
+    content         = ''
+    fieldname       = field_name_for(tag)
+    params          = tag.params
+    options         = nil
+
+    case tag.field_helper
+      when 'check_box'
+        options = params[0]
+        options[:checked] = !tag.content.to_i.zero?
+
+      when 'select'
+        params[0] = @template.options_for_select params[0], tag.content
+        options = params[1] || {}
+
+        # select_with_bootstrap(method, choices, options = {}, html_options = {})
+      when 'collection_select'
+        content << 'collection_select is not yet implemented'
+        options = params[1]
+        # method, collection, value_method, text_method, options = {}, html_options = {}
+      when 'grouped_collection_select'
+        content << 'grouped_collection_select is not yet implemented'
+        # grouped_collection_select_with_bootstrap(method, collection, group_method, group_label_method, option_key_method, option_value_method, options = {}, html_options = {})
+      when 'time_zone_select'
+        content << 'time_zone_select is not yet implemented'
+        # time_zone_select_with_bootstrap(method, priority_zones = nil, options = {}, html_options = {})
+      when 'radio_button'
+        content << 'radio_button is not yet implemented'
+
+        # def radio_button_with_bootstrap(name, value, *args)
+        #   options = args.extract_options!.symbolize_keys!
+        #   args << options.except(:label, :help, :inline)
+        #   html = radio_button_without_bootstrap(name, value, *args) + " " + options[:label]
+        #   if options[:inline]
+        #     label(name, html, class: "radio-inline", value: value)
+        #   else
+        #     content_tag(:div, class: "radio") do
+        #       label(name, html, value: value)
+        #     end
+        #   end
+        # end
+
+      when 'collection_check_boxes'
+        content << 'collection_check_boxes is not yet implemented'
+
+        # def collection_check_boxes(*args)
+        #   html = inputs_collection(*args) do |name, value, options|
+        #     options[:multiple] = true
+        #     check_box(name, options, value, nil)
+        #   end
+        #   hidden_field(args.first,{value: "", multiple: true}).concat(html)
+        # end
+
+      when 'collection_radio_buttons'
+        content << 'collection_radio_buttons is not yet implemented'
+        # def collection_radio_buttons(*args)
+        #   inputs_collection(*args) do |name, value, options|
+        #     radio_button(name, value, options)
+        #   end
+        # end
+        #
+      else
+        options = params[0]
+        options[:value] = tag.content
+    end
+
+    options[:label] ||= tag.blockable.class.human_attribute_name(tag.identifier.to_s)
+
+    begin
+      content << @template.send(tag.field_helper, "#{fieldname}[blocks_attributes][#{index}]", :content, *params)
+      content << @template.hidden_field_tag("#{fieldname}[blocks_attributes][#{index}][identifier]", tag.identifier, :id => nil)
+    rescue Exception => e
+      content << e.message
+      content << I18n.t('comfy.admin.cms.layouts.contains_invalid_tag') + ': ' + tag.field_helper
+    end
+    content.html_safe
+    form_group :label => {:text => options[:label]} do
+      content.html_safe
+    end
   end
 
   def collection(tag, index)
