@@ -10,7 +10,6 @@ default:
     layout_content_b
     {{cms:snippet:default}}
     layout_content_c
-    {{cms:page:bootstrap:email_field({"label": "someLabel", "placeholder": "placeholder"})}}
   css: default_css
   js: default_js
   position: 0

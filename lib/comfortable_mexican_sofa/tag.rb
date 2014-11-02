@@ -10,7 +10,7 @@ require 'csv'
 #   end
 module ComfortableMexicanSofa::Tag
 
-  TOKENIZER_REGEX   = /(\{\{\s*cms:.*\}\})|((?:\{?[^{])+|\{+)/
+  TOKENIZER_REGEX   = /(\{\{\s*cms:(?:(?!}}).)*\}\})|((?:\{?[^{])+|\{+)/
   IDENTIFIER_REGEX  = /\w+[\-\.\w]+\w+/
   METHOD_REGEX  = /\w+/
 
