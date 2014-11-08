@@ -101,11 +101,10 @@ class ComfortableMexicanSofa::FormBuilder < BootstrapForm::FormBuilder
     content         = ''
     fieldname       = field_name_for(tag)
     params          = tag.params
-    options         = nil
+    options         = params[0] || {}
 
     case tag.field_helper
       when 'check_box'
-        options = params[0]
         options[:checked] = !tag.content.to_i.zero?
 
       when 'select'
