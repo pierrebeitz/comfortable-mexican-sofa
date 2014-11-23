@@ -63,7 +63,7 @@ class Comfy::Admin::Cms::PagesControllerTest < ActionController::TestCase
     comfy_cms_layouts(:default).update_columns(:content =>'{{cms:field:test_label:datetime}}')
     get :new, :site_id => comfy_cms_sites(:default)
     assert_response :success
-    assert_select "input[type='text'][name='page[blocks_attributes][0][content]'][data-cms-datetime]"
+    assert_select "input[type='datetime'][name='page[blocks_attributes][0][content]']"
     assert_select "input[type='hidden'][name='page[blocks_attributes][0][identifier]'][value='test_label']"
   end
 
@@ -76,7 +76,7 @@ class Comfy::Admin::Cms::PagesControllerTest < ActionController::TestCase
   end
 
   def test_get_new_with_field_string
-    comfy_cms_layouts(:default).update_columns(:content => '{{cms:field:test_label:string}}')
+    comfy_cms_layouts(:default).update_columns(:content => '{{ cms:field:test_label:string }}')
     get :new, :site_id => comfy_cms_sites(:default)
     assert_response :success
     assert_select "input[type='text'][name='page[blocks_attributes][0][content]']"
@@ -103,7 +103,7 @@ class Comfy::Admin::Cms::PagesControllerTest < ActionController::TestCase
     comfy_cms_layouts(:default).update_columns(:content => '{{cms:page:test_label:datetime}}')
     get :new, :site_id => comfy_cms_sites(:default)
     assert_response :success
-    assert_select "input[type='text'][name='page[blocks_attributes][0][content]'][data-cms-datetime]"
+    assert_select "input[type='datetime'][name='page[blocks_attributes][0][content]']"
     assert_select "input[type='hidden'][name='page[blocks_attributes][0][identifier]'][value='test_label']"
   end
 
@@ -180,7 +180,7 @@ class Comfy::Admin::Cms::PagesControllerTest < ActionController::TestCase
     get :new, :site_id => comfy_cms_sites(:default)
     assert_response :success
     assert_select "input[type='hidden'][name='page[blocks_attributes][0][identifier]'][value='test_label']"
-    assert_select "input[type='hidden'][name='page[blocks_attributes][0][content]'][value='']"
+    assert_select "input[type='hidden'][name='page[blocks_attributes][0][content]'][value='0']"
     assert_select "input[type='checkbox'][name='page[blocks_attributes][0][content]'][value='1']"
   end
 
@@ -377,14 +377,6 @@ class Comfy::Admin::Cms::PagesControllerTest < ActionController::TestCase
     assert_response :success
     assert assigns(:page)
     assert_equal 4, assigns(:page).tags.size
-    assert_template :form_blocks
-  end
-
-  def test_get_form_blocks_for_new_page
-    xhr :get, :form_blocks, :site_id => comfy_cms_sites(:default), :id => 0, :layout_id => comfy_cms_layouts(:default).id
-    assert_response :success
-    assert assigns(:page)
-    assert_equal 3, assigns(:page).tags.size
     assert_template :form_blocks
   end
 

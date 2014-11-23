@@ -27,7 +27,7 @@
 
 = render 'comfy/admin/cms/categories/form', :form => form
 
-= render 'form_blocks'
+= render 'form_blocks', :form => form
 
 = form.form_group :is_published do
   = form.check_box :is_published, :label => t('.is_published')

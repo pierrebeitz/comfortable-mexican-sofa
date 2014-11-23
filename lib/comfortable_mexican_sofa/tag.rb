@@ -15,6 +15,7 @@ module ComfortableMexicanSofa::Tag
   METHOD_REGEX  = /\w+/
 
   attr_accessor :blockable,
+                :helper_method,
                 :identifier,
                 :namespace,
                 :params,

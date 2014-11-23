@@ -16,8 +16,6 @@
 #= require comfortable_mexican_sofa/cms/uploader
 #= require comfortable_mexican_sofa/cms/files
 
-$ ->
-  CMS.init()
 
 window.CMS ||= {}
 
@@ -94,14 +92,14 @@ window.CMS.sortable_list = ->
 
 
 window.CMS.timepicker = ->
-  $('input[type=text][data-cms-datetime]').datetimepicker
+  $('input[type=text][data-cms-datetime], input[type=datetime], input[type=datetime-local]').datetimepicker
+    autoclose:  true
     format:     'yyyy-mm-dd hh:ii'
     minView:    0
+  $('input[type=text][data-cms-date], input[type=date]').datetimepicker
     autoclose:  true
-  $('input[type=text][data-cms-date]').datetimepicker
     format:     'yyyy-mm-dd'
     minView:    2
-    autoclose:  true
 
 
 window.CMS.page_blocks = ->
@@ -165,3 +163,5 @@ window.CMS.set_iframe_layout = ->
     $("body").css("background-color", "transparent").css('padding', '20px')
     $(".center-column-content").detach().appendTo('body')
     $(".body-wrapper").remove()
+
+$ -> CMS.init()

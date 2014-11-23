@@ -18,6 +18,10 @@ class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
   end
 
   def new
+    @page.blocks = @page.tags(true).map do |t|
+      t.block.blockable = @page
+      t.block
+    end
     render
   end
 
